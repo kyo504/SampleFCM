@@ -11,8 +11,32 @@ import {
   Text,
   View
 } from 'react-native';
+import FCM from 'react-native-fcm';
 
 class SampleFCM extends Component {
+  componentDidMount() {
+    // FCM.getFCMToken().then(token => {
+    //   console.log(token);
+    // });
+   this.notificationUnsubscribe = FCM.on('notification', (notif) => {
+      console.log(notif)
+      // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
+    });
+    this.refreshUnsubscribe = FCM.on('refreshToken', (token) => {
+      console.log(token)
+      // fcm token may not be available on first load, catch it here
+    });
+
+    FCM.subscribeToTopic('/topics/foo-bar');
+    FCM.unsubscribeFromTopic('/topics/foo-bar');
+  }
+
+  componentWillUnmount() {
+    // prevent leaking
+    this.refreshUnsubscribe();
+    this.notificationUnsubscribe();
+  }
+
   render() {
     return (
       <View style={styles.container}>
